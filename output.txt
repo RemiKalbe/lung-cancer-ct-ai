@@ -1,0 +1,1799 @@
+<directory_tree>
+/
+├─ /.zed
+│  └─ settings.json
+├─ /app
+│  ├─ /__pycache__
+│  ├─ /data
+│  │  ├─ __init__.py
+│  │  ├─ augmentation.py
+│  │  ├─ dataset.py
+│  │  ├─ preprocessing.py
+│  │  └─ types.py
+│  ├─ /models
+│  │  ├─ __init__.py
+│  │  └─ unetr.py
+│  ├─ /utils
+│  │  ├─ __init__.py
+│  │  ├─ loss.py
+│  │  └─ patients.py
+│  ├─ __init__.py
+│  └─ main.py
+├─ /dataset
+├─ .gitattributes
+├─ .gitignore
+├─ .pylidcrc
+├─ README.md
+├─ pyproject.toml
+└─ pyrightconfig.json
+</directory_tree>
+
+<file path="./.gitattributes">
+# GitHub syntax highlighting
+pixi.lock linguist-language=YAML
+
+
+</file>
+<file path="./.gitignore">
+# Ignore the dataset, as it is too large.
+dataset/manifest-1719166718557
+
+# # #
+#  https://github.com/github/gitignore/blob/main/Python.gitignore
+# # #
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#poetry.lock
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#pdm.lock
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#  and can be added to the global gitignore or merged into this file.  For a more nuclear
+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+#.idea/
+# pixi environments
+.pixi
+*.egg-info
+
+
+</file>
+<file path="./.pylidcrc">
+[dicom]
+path = dataset/manifest-1719166718557/LIDC-IDRI
+warn = True
+</file>
+<file path="./README.md">
+
+</file>
+<file path="./pyproject.toml">
+[project]
+name = "lung-cancer-ct-ai"
+version = "0.1.0"
+description = "A model capable of detecting lung cancer from CT scans"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Remi Kalbe", email = "me@remi.boo" }]
+
+dependencies = ["pylidc"]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+#
+# Pixi configuration
+#
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[tool.pixi.tasks]
+train = "python -m app.main"
+
+[tool.pixi.dependencies]
+ruff = ">=0.6.1,<0.7"
+numpy = ">=2.1.0,<2.2"
+pytorch = ">=2.4.0,<2.5"
+torchvision = ">=0.19.0,<0.20"
+scipy = ">=1.14.1,<1.15"
+pydantic = ">=2.8.2,<2.9"
+tqdm = ">=4.66.5,<4.67"
+
+
+#
+# Ruff configuration
+#
+
+[tool.ruff]
+line-length = 100
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pixi",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 30
+
+</file>
+<file path="./pyrightconfig.json">
+{
+  "venv": "default",
+  "venvPath": ".pixi/envs"
+}
+
+</file>
+<file path="./.zed/settings.json">
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+  "languages": {
+    "Python": {
+      "language_servers": ["pyright", "ruff"],
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "code_actions": {
+            "source.organizeImports.ruff": true,
+            "source.fixAll.ruff": true
+          }
+        },
+        {
+          "language_server": {
+            "name": "ruff"
+          }
+        }
+      ]
+    }
+  },
+  "lsp": {
+    "pyright": {
+      "settings": {
+        "python.analysis": {
+          "diagnosticMode": "workspace",
+          "typeCheckingMode": "strict"
+        },
+        "python": {
+          "pythonPath": ".pixi/envs/default/bin/python"
+        }
+      }
+    }
+  }
+}
+
+</file>
+<file path="./app/__init__.py">
+
+</file>
+<file path="./app/main.py">
+import torch
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+import logging
+from typing import Dict, Any
+
+from app.models.unetr import UNETR
+from app.data.dataset import LIDCDataset
+from app.utils.loss import UNETRLoss
+from app.utils.patients import get_patient_ids
+from app.data.augmentation import (
+    Compose,
+    RandomRotation3D,
+    RandomFlip3D,
+    RandomZoom3D,
+    RandomNoise,
+    RandomIntensityShift,
+)
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+
+def get_transform(is_train: bool = True):
+    """
+    Get the transformation pipeline.
+
+    Args:
+        is_train (bool): Whether to return transformations for training or validation.
+
+    Returns:
+        Compose: A composition of transforms.
+    """
+    if is_train:
+        return Compose(
+            [
+                RandomRotation3D(max_angle=15),
+                RandomFlip3D(),
+                RandomZoom3D(min_factor=0.9, max_factor=1.1),
+                RandomNoise(noise_variance=0.01),
+                RandomIntensityShift(max_shift=0.1),
+            ]
+        )
+    else:
+        # For now, no augmentations during validation
+        return None
+
+
+def train(config: Dict[str, Any]):
+    """
+    Main training function.
+
+    Args:
+        config (Dict[str, Any]): Configuration dictionary containing hyperparameters and settings.
+    """
+    # Set device
+    device = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
+    )
+    logging.info(f"Using device: {device}")
+
+    # Initialize model
+    model = UNETR(
+        in_channels=config["in_channels"],
+        out_channels=config["out_channels"],
+        img_size=config["img_size"],
+        patch_size=config["patch_size"],
+        embed_dim=config["embed_dim"],
+    ).to(device)
+
+    # Initialize loss function and optimizer
+    criterion = UNETRLoss(
+        segmentation_weight=config["seg_weight"], classification_weight=config["class_weight"]
+    )
+    optimizer = optim.AdamW(model.parameters(), lr=config["learning_rate"])
+
+    # Get patient IDs
+    train_ids, val_ids = get_patient_ids(
+        max_patients=config["max_patients"], train_ratio=config["train_ratio"]
+    )
+
+    # Load datasets
+    train_dataset = LIDCDataset(train_ids, transform=config["train_transform"])
+    val_dataset = LIDCDataset(val_ids, transform=config["val_transform"])
+
+    train_loader = DataLoader(
+        train_dataset, batch_size=config["batch_size"], shuffle=True, num_workers=4
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=config["batch_size"], shuffle=False, num_workers=4
+    )
+
+    # Training loop
+    for epoch in range(config["num_epochs"]):
+        model.train()
+        train_loss = 0.0
+        train_seg_loss = 0.0
+        train_class_loss = 0.0
+
+        for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{config['num_epochs']}"):
+            inputs, true_seg, true_class = batch
+            inputs, true_seg, true_class = (
+                inputs.to(device),
+                true_seg.to(device),
+                true_class.to(device),
+            )
+
+            optimizer.zero_grad()
+
+            pred_seg, pred_class = model(inputs)
+            loss, seg_loss, class_loss = criterion(pred_seg, true_seg, pred_class, true_class)
+
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item()
+            train_seg_loss += seg_loss.item()
+            train_class_loss += class_loss.item()
+
+        # Validation
+        model.eval()
+        val_loss = 0.0
+        val_seg_loss = 0.0
+        val_class_loss = 0.0
+
+        with torch.no_grad():
+            for batch in val_loader:
+                inputs, true_seg, true_class = batch
+                inputs, true_seg, true_class = (
+                    inputs.to(device),
+                    true_seg.to(device),
+                    true_class.to(device),
+                )
+
+                pred_seg, pred_class = model(inputs)
+                loss, seg_loss, class_loss = criterion(pred_seg, true_seg, pred_class, true_class)
+
+                val_loss += loss.item()
+                val_seg_loss += seg_loss.item()
+                val_class_loss += class_loss.item()
+
+        # Log results
+        logging.info(f"Epoch {epoch+1}/{config['num_epochs']}:")
+        logging.info(f"Train Loss: {train_loss/len(train_loader):.4f}")
+        logging.info(f"Train Seg Loss: {train_seg_loss/len(train_loader):.4f}")
+        logging.info(f"Train Class Loss: {train_class_loss/len(train_loader):.4f}")
+        logging.info(f"Val Loss: {val_loss/len(val_loader):.4f}")
+        logging.info(f"Val Seg Loss: {val_seg_loss/len(val_loader):.4f}")
+        logging.info(f"Val Class Loss: {val_class_loss/len(val_loader):.4f}")
+
+        # Save checkpoint
+        if (epoch + 1) % config["save_frequency"] == 0:
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "loss": train_loss,
+                },
+                f"checkpoint_epoch_{epoch+1}.pth",
+            )
+
+
+if __name__ == "__main__":
+    # Configuration
+    config = {
+        "in_channels": 1,
+        "out_channels": 2,  # Binary segmentation
+        "img_size": (128, 128, 128),
+        "patch_size": 16,
+        "embed_dim": 768,
+        "seg_weight": 1.0,
+        "class_weight": 0.5,
+        "learning_rate": 1e-4,
+        "batch_size": 4,
+        "num_epochs": 100,
+        "save_frequency": 10,
+        "max_patients": 100,  # Set to None to use all patients
+        "train_ratio": 0.8,
+        "train_transform": get_transform(is_train=True),
+        "val_transform": get_transform(is_train=False),
+    }
+
+    train(config)
+
+</file>
+<file path="./app/data/__init__.py">
+
+</file>
+<file path="./app/data/augmentation.py">
+from typing import List
+
+import numpy as np
+from scipy.ndimage import rotate, zoom
+
+from .types import (
+    BinaryMask,
+    NormalizedVolume,
+    ScanLabels,
+    TransformPipeline,
+    TransformPipelineOutput,
+    Volume,
+)
+
+
+class Compose:
+    """
+    Composes several transforms together.
+
+    This class allows you to chain multiple augmentation techniques and apply them in sequence.
+
+    Args:
+        transforms (List[callable]): List of transforms to compose.
+    """
+
+    def __init__(self, transforms: List[TransformPipeline]):
+        self.transforms = transforms
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        for t in self.transforms:
+            volume, mask, labels = t(volume, mask, labels)
+        return volume, mask, labels
+
+
+class RandomRotation3D:
+    """
+    Randomly rotate the volume and mask.
+
+    This augmentation helps the model become invariant to the orientation of the scan.
+
+    Args:
+        max_angle (float): Maximum rotation angle in degrees. Default is 20.
+    """
+
+    def __init__(self, max_angle: float = 20):
+        self.max_angle = max_angle
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        # Choose a random angle
+        angle = np.random.uniform(-self.max_angle, self.max_angle)
+        # Randomly choose 2 axes to rotate around
+        axes = np.random.choice([0, 1, 2], size=2, replace=False)
+        # Rotate volume (order=1 for linear interpolation)
+        volume = rotate(volume, angle, axes=tuple(axes), reshape=False, order=1, mode="nearest")
+        # Rotate mask (order=0 for nearest neighbor interpolation to preserve label values)
+        mask = rotate(mask, angle, axes=tuple(axes), reshape=False, order=0, mode="nearest").astype(
+            np.bool_
+        )
+        return volume, mask, labels
+
+
+class RandomFlip3D:
+    """
+    Randomly flip the volume and mask along one of the axes.
+
+    This augmentation helps the model become invariant to the orientation of the scan.
+    It's useful for introducing variety in the positioning of organs and structures.
+    """
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        # Randomly choose an axis to flip
+        axis = np.random.choice([0, 1, 2])
+        # Flip both volume and mask along the chosen axis
+        if volume.dtype == np.int16:
+            volume = np.flip(volume, axis=axis).astype(np.int16)
+        else:
+            volume = np.flip(volume, axis=axis).astype(np.float64)
+        mask = np.flip(mask, axis=axis)
+        return volume, mask, labels
+
+
+class RandomZoom3D:
+    """
+    Randomly zoom in or out on the volume and mask.
+
+    This augmentation helps the model become robust to variations in the size of structures.
+    It's particularly useful for dealing with different scanner resolutions or patient sizes.
+
+    Args:
+        min_factor (float): Minimum zoom factor. Default is 0.9 (10% zoom out).
+        max_factor (float): Maximum zoom factor. Default is 1.1 (10% zoom in).
+    """
+
+    def __init__(self, min_factor: float = 0.9, max_factor: float = 1.1):
+        self.min_factor = min_factor
+        self.max_factor = max_factor
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        # Choose random zoom factors for each dimension
+        factor = np.random.uniform(self.min_factor, self.max_factor, 3)
+        # Apply zoom to volume (order=1 for linear interpolation)
+        volume = zoom(volume, factor, order=1, mode="nearest")
+        # Apply zoom to mask (order=0 for nearest neighbor interpolation to preserve label values)
+        mask = zoom(mask, factor, order=0, mode="nearest").astype(np.bool_)
+        return volume, mask, labels
+
+
+class RandomNoise:
+    """
+    Add random Gaussian noise to the volume.
+
+    This augmentation helps the model become robust to noise in the scans,
+    which can vary depending on the scanning equipment and settings.
+
+    Args:
+        noise_variance (float): Variance of the Gaussian noise. Default is 0.01.
+    """
+
+    def __init__(self, noise_variance: float = 0.01):
+        self.noise_variance = noise_variance
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        # Generate Gaussian noise
+        noise = np.random.normal(0, self.noise_variance**0.5, volume.shape)
+        # Add noise to the volume
+        volume = volume + noise
+        return volume, mask, labels
+
+
+class RandomIntensityShift:
+    """
+    Randomly shift the intensity values in the volume.
+
+    This augmentation helps the model become robust to variations in intensity levels,
+    which can occur due to differences in scanning equipment or settings.
+
+    Args:
+        max_shift (float): Maximum intensity shift as a fraction of the full intensity range.
+                           Default is 0.1 (10% of the intensity range).
+    """
+
+    def __init__(self, max_shift: float = 0.1):
+        self.max_shift = max_shift
+
+    def __call__(
+        self, volume: Volume | NormalizedVolume, mask: BinaryMask, labels: ScanLabels
+    ) -> TransformPipelineOutput:
+        # Choose a random shift value
+        shift = np.random.uniform(-self.max_shift, self.max_shift)
+        # Apply the shift to the volume
+        volume = volume + shift
+        # Clip values to ensure they stay in the [0, 1] range
+        volume = np.clip(volume, 0, 1)
+        return volume, mask, labels
+
+</file>
+<file path="./app/data/dataset.py">
+from typing import List, cast
+
+import numpy as np
+import pylidc as pl
+import scipy
+from pylidc.utils import consensus
+from scipy.ndimage import binary_fill_holes
+from torch.utils.data import Dataset
+
+from .preprocessing import preprocess_volume
+from .types import (
+    BinaryMask,
+    MalignancyInfo,
+    NoduleCharacteristics,
+    NoduleInfo,
+    NormalizedVolume,
+    ScanLabels,
+    TransformPipeline,
+    Volume,
+)
+
+
+class LIDCDataset(Dataset):
+    """
+    A PyTorch Dataset for the LIDC-IDRI lung cancer dataset.
+
+    This dataset loads CT scans and their corresponding nodule annotations
+    from the LIDC-IDRI dataset using the pylidc library. It provides access
+    to the CT volumes, segmentation masks, and malignancy labels.
+
+    Attributes:
+        patient_ids (list): List of patient IDs to include in the dataset.
+        transform (callable, optional): Optional transform to be applied on a sample.
+        scans (list): List of pylidc Scan objects corresponding to patient_ids.
+    """
+
+    patient_ids: List[str]
+    transform: TransformPipeline | None
+    scans: List[pl.Scan]
+
+    def __init__(self, patient_ids: List[str], transform: TransformPipeline | None = None):
+        """
+        Initialize the LIDCDataset.
+
+        Args:
+            patient_ids (list): List of patient IDs to include in the dataset.
+            transform (callable, optional): Optional transform to be applied on a sample.
+        """
+        self.patient_ids = patient_ids
+        self.transform = transform
+        self.scans = self._load_scans()
+
+    def _load_scans(self) -> List[pl.Scan]:
+        """
+        Load all scans corresponding to the patient IDs.
+
+        Returns:
+            list: List of pylidc Scan objects.
+        """
+        return cast(
+            List[pl.Scan],
+            [
+                pl.query(pl.Scan).filter(pl.Scan.patient_id == pid).first()
+                for pid in self.patient_ids
+            ],
+        )
+
+    def __len__(self):
+        """
+        Return the number of scans in the dataset.
+
+        Returns:
+            int: Number of scans in the dataset.
+        """
+        return len(self.scans)
+
+    def __getitem__(self, idx: int) -> tuple[Volume | NormalizedVolume, BinaryMask, ScanLabels]:
+        """
+        Fetch a sample from the dataset.
+
+        This method loads a CT volume, creates a segmentation mask,
+        and generates classification labels for the nodules.
+
+        Args:
+            idx (int): Index of the sample to fetch.
+
+        Returns:
+            tuple: (volume, mask, labels) where volume is the CT scan,
+                   mask is the segmentation mask, and labels are the
+                   classification labels for the nodules.
+        """
+        scan = self.scans[idx]
+        volume = scan.to_volume()
+        mask = self._create_mask(scan)
+        labels = self._create_labels(scan)
+
+        # Preprocess the volume
+        volume = preprocess_volume(scan)
+
+        if self.transform:
+            volume, mask, labels = self.transform(volume, mask, labels)
+
+        return volume, mask, labels
+
+    def _create_mask(self, scan: pl.Scan) -> BinaryMask:
+        """
+        Create a 3D segmentation mask from nodule annotations.
+
+        This method creates a binary mask where voxels belonging to annotated nodules
+        are set to 1, and all other voxels are 0. It uses a consensus approach,
+        including a voxel if at least 50% of the radiologists marked it as part of a nodule.
+
+        Args:
+            scan (pylidc.Scan): A pylidc Scan object.
+
+        Returns:
+            np.ndarray: A 3D numpy array representing the segmentation mask.
+        """
+        volume_shape = scan.to_volume().shape
+        # Get the shape of the full CT volume
+
+        full_mask = np.zeros(volume_shape, dtype=np.bool)
+        # Initialize an empty mask
+
+        nodules = scan.cluster_annotations()
+        # Group annotations by nodule
+
+        for nodule in nodules:
+            consensus_results = consensus(nodule, clevel=0.5, pad=[(0, 0), (0, 0), (0, 0)])
+            # In the case that a nodule has conflicting annotations,
+            # (radiologists disagree on the malignancy of the nodule),
+            # we use the consensus function from pylidc.utils to compute
+            # --well, the consensus between the annotations.
+            #
+            # - nodule: a list of Annotation objects
+            # - clevel: This is the consensus level. It determines the
+            #   threshold for including a voxel in the final mask:
+            #      > 0.5 means that a voxel will be included in the consensus
+            #      mask if at least 50% of the annotations marked it as part of the nodule.
+            # - pad: This parameter specifies padding for the bounding box of the nodule:
+            #      > It's a list of three tuples, one for each dimension (x, y, z).
+            #      > Each tuple specifies the padding before and after the nodule
+            #        in that dimension.
+            #      > In this case, we're specifying no padding (0 before, 0 after)
+            #        for all dimensions.
+            #      > We might adjust this if we want to include some context
+            #        around the nodule. For example, [(1,1), (1,1), (1,1)] would
+            #        add one voxel of padding in all directions.
+
+            if len(consensus_results) == 3:
+                cmask, cbbox, _ = consensus_results
+                # Unpack the results
+            else:
+                cmask, cbbox = consensus_results
+                # Unpack the results
+
+            full_mask[cbbox] = np.logical_or(full_mask[cbbox], cmask)
+            # Place the nodule mask in the full mask
+
+        filled_mask = binary_fill_holes(full_mask)
+        # Fill any holes in the mask
+
+        if filled_mask is None:
+            # Handle the case where binary_fill_holes returns None
+            return full_mask.astype(np.bool_)
+            # When binary_fill_holes returns None, it typically means one of two things:
+            #    a) The input array (full_mask) was empty (had a size of 0 in any dimension).
+            #    b) The input array contained only False values (this would mean no nodules were detected).
+        else:
+            return filled_mask.astype(np.bool_)
+
+    def _create_labels(self, scan: pl.Scan) -> ScanLabels:
+        """
+        Create classification labels for each nodule in the scan.
+
+        This method assigns malignancy labels and other characteristics
+        to each annotated nodule based on the radiologists' assessments.
+
+        Args:
+            scan (pylidc.Scan): A pylidc Scan object.
+
+        Returns:
+            ScanLabels: A Pydantic model containing a list of NoduleInfo objects,
+                        each with detailed information about a nodule, including
+                        aggregated assessments from multiple radiologists.
+        """
+        nodules = scan.cluster_annotations()
+        # Group annotations by nodule
+
+        labels = []
+        for nodule_idx, nodule_anns in enumerate(nodules):
+            malignancy_scores = [ann.malignancy for ann in nodule_anns]
+
+            nodule_info = NoduleInfo(
+                nodule_id=nodule_idx,
+                bbox=nodule_anns[0].bbox(),  # Using first annotation's bbox
+                centroid=np.mean([ann.centroid for ann in nodule_anns], axis=0),
+                diameter_mm=np.mean([ann.diameter for ann in nodule_anns]),
+                volume_mm3=np.mean([ann.volume for ann in nodule_anns]),
+                is_small=all(ann.diameter < 3 for ann in nodule_anns),
+                num_annotations=len(nodule_anns),
+                malignancy=MalignancyInfo(
+                    mean=np.mean(malignancy_scores),
+                    median=np.median(malignancy_scores),
+                    mode=scipy.stats.mode(malignancy_scores).mode[0],
+                    std=np.std(malignancy_scores),
+                ),
+                characteristics=NoduleCharacteristics(
+                    subtlety=np.mean([ann.subtlety for ann in nodule_anns]),
+                    internal_structure=np.mean([ann.internalStructure for ann in nodule_anns]),
+                    calcification=np.mean([ann.calcification for ann in nodule_anns]),
+                    sphericity=np.mean([ann.sphericity for ann in nodule_anns]),
+                    margin=np.mean([ann.margin for ann in nodule_anns]),
+                    lobulation=np.mean([ann.lobulation for ann in nodule_anns]),
+                    spiculation=np.mean([ann.spiculation for ann in nodule_anns]),
+                    texture=np.mean([ann.texture for ann in nodule_anns]),
+                ),
+            )
+            labels.append(nodule_info)
+
+        return ScanLabels(nodules=labels)
+
+</file>
+<file path="./app/data/preprocessing.py">
+import numpy as np
+import pylidc as pl
+from scipy.ndimage import zoom
+
+from .types import NDArray3, NormalizedVolume, Volume
+
+
+def resample_volume(scan: pl.Scan, new_spacings: NDArray3[np.int_] = np.array([1, 1, 1])) -> Volume:
+    """
+    This function ensures that all CT scans have the same voxel spacing.
+    Different CT scanners might produce images with different spatial resolutions.
+    Resampling to a standard spacing (e.g., 1mm x 1mm x 1mm) makes the data consistent across all samples.
+
+    Args:
+        scan (pl.Scan): The input CT scan.
+        new_spacings (list): The desired voxel spacing, default is isotropic 1mm.
+
+    Returns:
+        np.ndarray: The resampled volume.
+    """
+    volume = scan.to_volume()
+    # Convert the scan to a numpy array
+
+    spacings = scan.spacings
+    # Current spacing
+
+    resize_factor = spacings / new_spacings
+    # Calculate how much we need to resize each dimension
+
+    new_real_shape = volume.shape * resize_factor
+    # Calculate the new shape of the volume
+
+    new_shape = np.round(new_real_shape)
+    # Round the new shape to the nearest integer
+
+    real_resize_factor = new_shape / volume.shape
+    # Calculate the actual resize factor
+
+    zoomed_volume = zoom(volume, real_resize_factor, mode="nearest")
+    # Use scipy's zoom function to resize the volume
+
+    return np.round(zoomed_volume).astype(np.int16)
+    # Round the zoomed volume to the nearest integer and convert to int16
+
+
+def normalize_hu(volume: Volume) -> NormalizedVolume:
+    """
+    Normalize the HU values of the CT volume.
+    CT scans use Hounsfield Units (HU) to represent radiodensity.
+    These units typically range from -1000 (air) to +3000 (dense bone),
+    but most soft tissues fall within a smaller range. Normalizing
+    these values to a standard range helps the machine learning model
+    focus on the relevant intensity variations and improves training stability.
+
+    Args:
+        volume (np.ndarray): The input CT volume in Hounsfield Units.
+
+    Returns:
+        np.ndarray: The normalized volume.
+    """
+    min_hu = -1000
+    max_hu = 400
+    # Define the HU range we're interested in
+    # -1000 HU is typically air, 400 HU covers most soft tissues
+
+    volume = np.clip(volume, min_hu, max_hu)
+    # Clip the volume so all values are between min_hu and max_hu
+
+    normalized_volume = (volume - min_hu) / (max_hu - min_hu)
+    # Normalize the values to be between 0 and 1
+
+    return normalized_volume
+
+
+def preprocess_volume(scan: pl.Scan) -> NormalizedVolume:
+    """
+    Preprocess the CT volume: resample and normalize.
+
+    Args:
+        scan (pl.Scan): The input CT scan.
+
+    Returns:
+        np.ndarray: The preprocessed volume.
+    """
+    volume = resample_volume(scan)
+    volume = normalize_hu(volume)
+    return volume
+
+</file>
+<file path="./app/data/types.py">
+from typing import Annotated, Callable, List, Tuple, TypedDict, TypeVar
+
+import numpy as np
+import numpy.typing as npt
+from pydantic import BaseModel, Field
+
+#
+# Utils
+#
+
+DType = TypeVar("DType", bound=np.generic)
+NDArray3 = Annotated[npt.NDArray[DType], np.ndim == 3]
+
+#
+# Labels
+#
+
+
+class MalignancyInfo(BaseModel):
+    mean: np.floating
+    median: np.floating
+    mode: np.floating
+    std: np.floating
+
+
+class NoduleCharacteristics(BaseModel):
+    subtlety: np.floating
+    internal_structure: np.floating
+    calcification: np.floating
+    sphericity: np.floating
+    margin: np.floating
+    lobulation: np.floating
+    spiculation: np.floating
+    texture: np.floating
+
+
+class NoduleInfo(BaseModel):
+    nodule_id: int
+    bbox: tuple[slice, slice, slice]
+    centroid: np.ndarray = Field(..., examples=[[100.0, 100.0, 50.0]])
+    diameter_mm: np.floating
+    volume_mm3: np.floating
+    is_small: bool
+    num_annotations: int
+    malignancy: MalignancyInfo
+    characteristics: NoduleCharacteristics
+
+
+class ScanLabels(BaseModel):
+    nodules: List[NoduleInfo]
+
+
+#
+# More general types
+#
+
+BinaryMask = npt.NDArray[np.bool_]
+
+Volume = npt.NDArray[np.int16]
+NormalizedVolume = npt.NDArray[np.floating]
+
+
+class TransformPipelineInput(TypedDict):
+    volume: Volume | NormalizedVolume
+    mask: BinaryMask
+    labels: ScanLabels
+
+
+TransformPipelineOutput = Tuple[Volume | NormalizedVolume, BinaryMask, ScanLabels]
+TransformPipeline = Callable[
+    [Volume | NormalizedVolume, BinaryMask, ScanLabels],
+    TransformPipelineOutput,
+]
+
+</file>
+<file path="./app/models/__init__.py">
+
+</file>
+<file path="./app/models/unetr.py">
+from typing import Any, Dict, List, Optional, Tuple
+
+import torch as tc
+import torch.nn as nn
+
+
+class PatchEmbedding(nn.Module):
+    """
+    Converts a 3D volume into a sequence of patch embeddings.
+
+    This class is inspired by the Vision Transformer (ViT) architecture, adapted for 3D volumes
+    as used in the UNETR paper.
+
+    In the context of 3D medical imaging, this layer divides the input volume into non-overlapping
+    3D patches and projects each patch into a lower-dimensional embedding space. This is the first
+    step in processing the input for the transformer encoder in the UNETR architecture.
+
+    Attributes:
+        patch_size (int): The size of the patches in each dimension (assumed to be cubic).
+        proj (nn.Conv3d): 3D convolution layer that both divides the input into patches and projects them.
+    """
+
+    def __init__(self, patch_size: int = 16, in_channels: int = 1, embed_dim: int = 768) -> None:
+        """
+        Initializes the PatchEmbedding module.
+
+        Args:
+            patch_size (int): The size of the patches. Default is 16, as used in the UNETR paper.
+            in_channels (int): The number of input channels. Default is 1 for typical CT scans.
+            embed_dim (int): The dimension of the embedding space. Default is 768, following the UNETR paper.
+        """
+        super().__init__()
+        self.patch_size: int = patch_size
+
+        # The Conv3d layer serves dual purpose:
+        # 1. It divides the input into patches (by using kernel_size and stride equal to patch_size)
+        # 2. It projects these patches into the embedding space (by setting out_channels to embed_dim)
+        self.proj: nn.Conv3d = nn.Conv3d(
+            in_channels, embed_dim, kernel_size=patch_size, stride=patch_size
+        )
+
+    def forward(self, x: tc.Tensor) -> tc.Tensor:
+        """
+        Forward pass of the PatchEmbedding module.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, in_channels, H, W, D)
+                              where H, W, D are the height, width, and depth of the input volume.
+
+        Returns:
+            torch.Tensor: Tensor of shape (batch_size, num_patches, embed_dim)
+                          where num_patches = (H/patch_size) * (W/patch_size) * (D/patch_size)
+
+        Raises:
+            ValueError: If input tensor dimensions are not divisible by patch_size.
+        """
+        # Check if input dimensions are divisible by patch_size
+        if any(dim % self.patch_size != 0 for dim in x.shape[2:]):
+            raise ValueError(
+                f"Input tensor spatial dimensions must be divisible by patch_size {self.patch_size}"
+            )
+
+        # Apply the projection (which also divides into patches)
+        x = self.proj(x)  # Shape: (batch_size, embed_dim, H', W', D')
+        # where H', W', D' are the reduced spatial dimensions
+
+        # Reshape and transpose to get the final sequence of patch embeddings
+        return x.flatten(2).transpose(1, 2)  # Shape: (batch_size, num_patches, embed_dim)
+
+    @property
+    def num_patches(self) -> Tuple[int, int, int]:
+        """
+        Calculates the number of patches in each dimension.
+
+        Returns:
+            Tuple[int, int, int]: Number of patches in height, width, and depth dimensions.
+        """
+        return (self.patch_size, self.patch_size, self.patch_size)
+
+
+class TransformerEncoder(nn.Module):
+    """
+    Transformer Encoder for the UNETR architecture.
+
+    This class implements the transformer encoder part of the UNETR model as described in the paper.
+    It consists of multiple transformer encoder layers that process the patch embeddings.
+
+    The encoder produces outputs at different depths, which are later used by the decoder
+    for multi-scale feature fusion, similar to skip connections in U-Net architectures.
+
+    Attributes:
+        layers (nn.ModuleList): List of transformer encoder layers.
+        norm (nn.LayerNorm): Layer normalization applied after the transformer layers.
+    """
+
+    def __init__(
+        self,
+        embed_dim: int = 768,
+        depth: int = 12,
+        num_heads: int = 12,
+        mlp_ratio: float = 4.0,
+        dropout: float = 0.1,
+        attention_dropout: float = 0.0,
+    ) -> None:
+        """
+        Initialize the TransformerEncoder.
+
+        Args:
+            embed_dim (int): Dimension of the input embeddings. Default is 768.
+            depth (int): Number of transformer layers. Default is 12.
+            num_heads (int): Number of attention heads in each transformer layer. Default is 12.
+            mlp_ratio (float): Ratio of mlp hidden dim to embedding dim. Default is 4.0.
+            dropout (float): Dropout rate. Default is 0.1.
+            attention_dropout (float): Dropout rate for attention weights. Default is 0.0.
+        """
+        super().__init__()
+
+        self.depth = depth
+        self.layers = nn.ModuleList(
+            [
+                TransformerEncoderLayer(
+                    d_model=embed_dim,
+                    nhead=num_heads,
+                    dim_feedforward=int(embed_dim * mlp_ratio),
+                    dropout=dropout,
+                    attention_dropout=attention_dropout,
+                )
+                for _ in range(depth)
+            ]
+        )
+
+        self.norm = nn.LayerNorm(embed_dim)
+
+    def forward(self, x: tc.Tensor, mask: Optional[tc.Tensor] = None) -> List[tc.Tensor]:
+        """
+        Forward pass of the TransformerEncoder.
+
+        This method processes the input through all transformer layers and returns
+        the outputs of specific layers for later use in the decoder.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, num_patches, embed_dim).
+            mask (Optional[torch.Tensor]): Attention mask (if needed). Default is None.
+
+        Returns:
+            List[torch.Tensor]: List of output tensors from specific layers of the transformer.
+                                Each tensor has shape (batch_size, num_patches, embed_dim).
+        """
+        features = []
+        for i, layer in enumerate(self.layers):
+            x = layer(x, src_mask=mask)
+            if i in self.get_output_layers():  # Collect features from these specific layers
+                features.append(self.norm(x))
+
+        return features
+
+    def get_output_layers(self) -> List[int]:
+        """
+        Determine which layer outputs to collect based on the depth of the transformer.
+
+        Returns:
+            List[int]: Indices of layers whose outputs should be collected.
+        """
+        if self.depth <= 4:
+            return [self.depth - 1]  # Only return the last layer if depth is 4 or less
+        elif self.depth <= 8:
+            return [self.depth // 2 - 1, self.depth - 1]  # Return middle and last layer
+        else:
+            # Divide the depth into 4 segments and return the last layer of each segment
+            return [i - 1 for i in range(self.depth // 4, self.depth + 1, self.depth // 4)]
+
+
+class TransformerEncoderLayer(nn.Module):
+    """
+    A single Transformer Encoder Layer.
+
+    This class implements a single layer of the transformer encoder, including
+    multi-head self-attention and a feed-forward network.
+
+    Attributes:
+        self_attn (nn.MultiheadAttention): Multi-head self-attention module.
+        linear1 (nn.Linear): First linear layer of the feed-forward network.
+        dropout (nn.Dropout): Dropout layer.
+        linear2 (nn.Linear): Second linear layer of the feed-forward network.
+        norm1 (nn.LayerNorm): Layer normalization after self-attention.
+        norm2 (nn.LayerNorm): Layer normalization after feed-forward network.
+        dropout1 (nn.Dropout): Dropout after self-attention.
+        dropout2 (nn.Dropout): Dropout after feed-forward network.
+        activation (nn.Module): Activation function for the feed-forward network.
+    """
+
+    def __init__(
+        self,
+        d_model: int,
+        nhead: int,
+        dim_feedforward: int = 2048,
+        dropout: float = 0.1,
+        attention_dropout: float = 0.0,
+        activation: str = "relu",
+    ) -> None:
+        """
+        Initialize the TransformerEncoderLayer.
+
+        Args:
+            d_model (int): The number of expected features in the input.
+            nhead (int): The number of heads in the multiheadattention model.
+            dim_feedforward (int): The dimension of the feedforward network model. Default is 2048.
+            dropout (float): Dropout value. Default is 0.1.
+            attention_dropout (float): Dropout for attention weights. Default is 0.0.
+            activation (str): The activation function for the feed-forward network. Default is "relu".
+        """
+        super(TransformerEncoderLayer, self).__init__()
+        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=attention_dropout)
+
+        self.linear1 = nn.Linear(d_model, dim_feedforward)
+        self.dropout = nn.Dropout(dropout)
+        self.linear2 = nn.Linear(dim_feedforward, d_model)
+
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.dropout1 = nn.Dropout(dropout)
+        self.dropout2 = nn.Dropout(dropout)
+
+        self.activation = self._get_activation_fn(activation)
+
+    def _get_activation_fn(self, activation: str) -> nn.Module:
+        """
+        Get the activation function.
+
+        Args:
+            activation (str): Name of the activation function.
+
+        Returns:
+            nn.Module: The activation function.
+
+        Raises:
+            RuntimeError: If the activation function is not supported.
+        """
+        if activation == "relu":
+            return nn.ReLU()
+        elif activation == "gelu":
+            return nn.GELU()
+        raise RuntimeError(f"Activation should be relu/gelu, not {activation}")
+
+    def forward(
+        self,
+        src: tc.Tensor,
+        src_mask: Optional[tc.Tensor] = None,
+        src_key_padding_mask: Optional[tc.Tensor] = None,
+    ) -> tc.Tensor:
+        """
+        Forward pass of the TransformerEncoderLayer.
+
+        Args:
+            src (torch.Tensor): The input tensor of shape (seq_len, batch_size, embed_dim).
+            src_mask (Optional[torch.Tensor]): The mask for the src sequence. Default is None.
+            src_key_padding_mask (Optional[torch.Tensor]): The mask for the src keys per batch. Default is None.
+
+        Returns:
+            torch.Tensor: Output tensor of shape (seq_len, batch_size, embed_dim).
+        """
+        src2 = self.self_attn(
+            src, src, src, attn_mask=src_mask, key_padding_mask=src_key_padding_mask
+        )[0]
+        src = src + self.dropout1(src2)
+        src = self.norm1(src)
+        src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))
+        src = src + self.dropout2(src2)
+        src = self.norm2(src)
+        return src
+
+
+class DecoderBlock(nn.Module):
+    """
+    Decoder Block for the UNETR architecture.
+
+    This class implements a single decoder block of the UNETR model as described in the paper.
+    It performs upsampling of the input features and combines them with skip connections
+    from the encoder, similar to the U-Net architecture.
+
+    Each decoder block consists of:
+    1. A 3D transposed convolution for upsampling
+    2. Concatenation with skip connection features (if provided)
+    3. Two 3D convolutions with batch normalization and ReLU activation
+
+    Attributes:
+        conv_trans (nn.ConvTranspose3d): Transposed convolution for upsampling
+        conv1 (nn.Conv3d): First 3D convolution
+        conv2 (nn.Conv3d): Second 3D convolution
+        norm1 (nn.BatchNorm3d): Batch normalization after first convolution
+        norm2 (nn.BatchNorm3d): Batch normalization after second convolution
+        relu (nn.ReLU): ReLU activation function
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 3, stride: int = 2):
+        """
+        Initialize the DecoderBlock.
+
+        Args:
+            in_channels (int): Number of input channels
+            out_channels (int): Number of output channels
+            kernel_size (int): Size of the convolutional kernel. Default is 3.
+            stride (int): Stride of the transposed convolution (determines the upsampling factor). Default is 2.
+        """
+        super().__init__()
+
+        # Transposed convolution for upsampling
+        self.conv_trans = nn.ConvTranspose3d(
+            in_channels, out_channels, kernel_size=stride, stride=stride
+        )
+
+        # First convolution and normalization
+        self.conv1 = nn.Conv3d(out_channels * 2, out_channels, kernel_size=kernel_size, padding=1)
+        self.norm1 = nn.BatchNorm3d(out_channels)
+
+        # Second convolution and normalization
+        self.conv2 = nn.Conv3d(out_channels, out_channels, kernel_size=kernel_size, padding=1)
+        self.norm2 = nn.BatchNorm3d(out_channels)
+
+        # ReLU activation
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x: tc.Tensor, skip: Optional[tc.Tensor] = None) -> tc.Tensor:
+        """
+        Forward pass of the DecoderBlock.
+
+        This method upsamples the input, combines it with skip connections if provided,
+        and applies convolutions with normalizations and activations.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, in_channels, D, H, W)
+            skip (Optional[torch.Tensor]): Skip connection tensor from the encoder,
+                                           of shape (batch_size, out_channels, D*stride, H*stride, W*stride).
+                                           If None, no skip connection is used. Default is None.
+
+        Returns:
+            torch.Tensor: Output tensor of shape (batch_size, out_channels, D*stride, H*stride, W*stride)
+
+        Raises:
+            ValueError: If the spatial dimensions of the skip connection do not match the upsampled input.
+        """
+        # Upsample input
+        x = self.conv_trans(x)
+
+        # Combine with skip connection if provided
+        if skip is not None:
+            if x.shape[2:] != skip.shape[2:]:
+                raise ValueError(
+                    f"Shape mismatch in DecoderBlock: "
+                    f"upsampled shape {x.shape[2:]} != skip shape {skip.shape[2:]}"
+                )
+            x = tc.cat([x, skip], dim=1)
+
+        # Apply convolutions with normalizations and activations
+        x = self.relu(self.norm1(self.conv1(x)))
+        x = self.relu(self.norm2(self.conv2(x)))
+
+        return x
+
+
+class UNETR(nn.Module):
+    """
+    UNETR: UNet Transformer for 3D Medical Image Segmentation
+
+    This class implements the UNETR architecture as described in the paper
+    "UNETR: Transformers for 3D Medical Image Segmentation" (Hatamizadeh et al., 2022).
+
+    UNETR combines a transformer encoder with a CNN decoder for 3D medical image segmentation.
+    It uses skip connections from the transformer encoder to the CNN decoder for multi-scale feature fusion.
+
+    Attributes:
+        patch_embedding (PatchEmbedding): Module to convert input volume into patch embeddings.
+        transformer (TransformerEncoder): Transformer encoder to process patch embeddings.
+        decoder_blocks (nn.ModuleList): List of decoder blocks for upsampling and feature fusion.
+        segmentation_head (nn.Conv3d): Final convolution layer for segmentation output.
+        classification_head (nn.Sequential): Sequence of layers for nodule classification.
+    """
+
+    def __init__(
+        self,
+        in_channels: int = 1,
+        out_channels: int = 2,
+        img_size: Tuple[int, int, int] = (128, 128, 128),
+        patch_size: int = 16,
+        embed_dim: int = 768,
+        num_heads: int = 12,
+        depth: int = 12,
+        mlp_ratio: float = 4.0,
+        dropout: float = 0.1,
+    ):
+        """
+        Initialize the UNETR model.
+
+        Args:
+            in_channels (int): Number of input channels in the image. Default is 1 for CT scans.
+            out_channels (int): Number of output channels (classes) for segmentation. Default is 2.
+            img_size (Tuple[int, int, int]): Size of the input image (D, H, W). Default is (128, 128, 128).
+            patch_size (int): Size of the patches to be extracted from the input image. Default is 16.
+            embed_dim (int): Dimension of the patch embeddings. Default is 768.
+            num_heads (int): Number of attention heads in the transformer. Default is 12.
+            depth (int): Number of transformer layers. Default is 12.
+            mlp_ratio (float): Ratio of MLP hidden dim to embedding dim in transformer. Default is 4.0.
+            dropout (float): Dropout rate in the transformer. Default is 0.1.
+        """
+        super().__init__()
+
+        self.patch_embedding = PatchEmbedding(patch_size, in_channels, embed_dim)
+        self.transformer = TransformerEncoder(embed_dim, depth, num_heads, mlp_ratio, dropout)
+
+        # Calculate the number of patches in each dimension
+        self.patches_per_dim = [img_size[i] // patch_size for i in range(3)]
+
+        # Decoder blocks
+        self.decoder_blocks = nn.ModuleList(
+            [
+                DecoderBlock(embed_dim, 512),
+                DecoderBlock(512, 256),
+                DecoderBlock(256, 128),
+                DecoderBlock(128, 64),
+            ]
+        )
+
+        # Segmentation head
+        self.segmentation_head = nn.Conv3d(64, out_channels, kernel_size=1)
+
+        # Classification head
+        self.classification_head = nn.Sequential(
+            nn.AdaptiveAvgPool3d(1),
+            nn.Flatten(),
+            nn.Linear(embed_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(256, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x: tc.Tensor) -> Tuple[tc.Tensor, tc.Tensor]:
+        """
+        Forward pass of the UNETR model.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, in_channels, D, H, W)
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]:
+                - Segmentation output of shape (batch_size, out_channels, D, H, W)
+                - Classification output of shape (batch_size, 1)
+
+        Raises:
+            ValueError: If input tensor shape doesn't match the expected input size.
+        """
+        # Check input size
+        if x.shape[2:] != tuple(
+            self.patches_per_dim[i] * self.patch_embedding.patch_size for i in range(3)
+        ):
+            raise ValueError(f"Input tensor shape {x.shape} doesn't match the expected input size.")
+
+        # Patch embedding
+        x = self.patch_embedding(x)
+
+        # Transformer encoder
+        features = self.transformer(x)
+
+        # Reshape features for decoder
+        batch_size = x.shape[0]
+        features = [
+            feat.transpose(1, 2).view(batch_size, -1, *self.patches_per_dim) for feat in features
+        ]
+
+        # Decoder
+        x = features[-1]
+        for i, decoder_block in enumerate(self.decoder_blocks):
+            skip = features[-(i + 2)] if i < len(features) - 1 else None
+            x = decoder_block(x, skip)
+
+        # Segmentation output
+        segmentation = self.segmentation_head(x)
+
+        # Classification output
+        classification = self.classification_head(features[-1])
+
+        return segmentation, classification
+
+    def get_parameters(self) -> List[Dict[str, Any]]:
+        """
+        Get all parameters of the model.
+
+        Returns:
+            List[Dict[str, Any]]: List of dictionaries containing parameter groups.
+        """
+        return [
+            {"params": self.patch_embedding.parameters()},
+            {"params": self.transformer.parameters()},
+            {"params": self.decoder_blocks.parameters()},
+            {"params": self.segmentation_head.parameters()},
+            {"params": self.classification_head.parameters()},
+        ]
+
+</file>
+<file path="./app/utils/__init__.py">
+
+</file>
+<file path="./app/utils/loss.py">
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class UNETRLoss(nn.Module):
+    """
+    Custom loss function for UNETR model in lung nodule detection and classification.
+
+    This loss function combines segmentation and classification losses:
+    - For segmentation: Combination of Dice Loss and Focal Loss
+    - For classification: Binary Cross-Entropy Loss
+
+    Attributes:
+        segmentation_weight (float): Weight for the segmentation loss component.
+        classification_weight (float): Weight for the classification loss component.
+        alpha (float): Weighting factor in Focal Loss to balance positive vs negative samples.
+        gamma (float): Focusing parameter in Focal Loss to focus on hard examples.
+        smooth (float): Smoothing factor for Dice Loss to avoid division by zero.
+        eps (float): Small constant to avoid numerical instability.
+    """
+
+    def __init__(
+        self,
+        segmentation_weight: float = 1.0,
+        classification_weight: float = 1.0,
+        alpha: float = 0.25,
+        gamma: float = 2.0,
+        smooth: float = 1e-5,
+        eps: float = 1e-7,
+    ):
+        """
+        Initialize the UNETRLoss.
+
+        Args:
+            segmentation_weight (float): Weight for segmentation loss. Default is 1.0.
+            classification_weight (float): Weight for classification loss. Default is 1.0.
+            alpha (float): Weighting factor in Focal Loss. Default is 0.25.
+            gamma (float): Focusing parameter in Focal Loss. Default is 2.0.
+            smooth (float): Smoothing factor for Dice Loss. Default is 1e-5.
+            eps (float): Small constant for numerical stability. Default is 1e-7.
+        """
+        super().__init__()
+        self.segmentation_weight = segmentation_weight
+        self.classification_weight = classification_weight
+        self.alpha = alpha
+        self.gamma = gamma
+        self.smooth = smooth
+        self.eps = eps
+
+    def forward(
+        self,
+        pred_seg: torch.Tensor,
+        true_seg: torch.Tensor,
+        pred_class: torch.Tensor,
+        true_class: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Compute the combined loss for segmentation and classification.
+
+        Args:
+            pred_seg (torch.Tensor): Predicted segmentation mask, shape (B, C, D, H, W)
+            true_seg (torch.Tensor): Ground truth segmentation mask, shape (B, C, D, H, W)
+            pred_class (torch.Tensor): Predicted classification probabilities, shape (B, 1)
+            true_class (torch.Tensor): Ground truth classification labels, shape (B, 1)
+
+        Returns:
+            tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+                - total_loss: Combined weighted loss
+                - seg_loss: Segmentation loss (Dice + Focal)
+                - class_loss: Classification loss (Binary Cross-Entropy)
+        """
+        # Compute segmentation loss (Dice + Focal)
+        dice_loss = self.dice_loss(pred_seg, true_seg)
+        focal_loss = self.focal_loss(pred_seg, true_seg)
+        seg_loss = dice_loss + focal_loss
+
+        # Compute classification loss (Binary Cross-Entropy)
+        class_loss = F.binary_cross_entropy(pred_class, true_class, reduction="mean")
+
+        # Combine losses with weights
+        total_loss = self.segmentation_weight * seg_loss + self.classification_weight * class_loss
+
+        return total_loss, seg_loss, class_loss
+
+    def dice_loss(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        """
+        Compute Dice Loss for segmentation.
+
+        Dice Loss is effective for handling class imbalance in segmentation tasks.
+
+        Args:
+            pred (torch.Tensor): Predicted segmentation mask, shape (B, C, D, H, W)
+            target (torch.Tensor): Ground truth segmentation mask, shape (B, C, D, H, W)
+
+        Returns:
+            torch.Tensor: Dice Loss value
+        """
+        pred = F.softmax(pred, dim=1)
+        num_classes = pred.shape[1]
+
+        dice_loss = torch.zeros(1, device=pred.device)
+        for class_idx in range(num_classes):
+            pred_class = pred[:, class_idx, ...]
+            target_class = (target == class_idx).float()
+
+            intersection = (pred_class * target_class).sum()
+            union = pred_class.sum() + target_class.sum()
+
+            dice_score = (2.0 * intersection + self.smooth) / (union + self.smooth)
+            dice_loss += 1 - dice_score
+
+        return dice_loss / num_classes
+
+    def focal_loss(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        """
+        Compute Focal Loss for segmentation.
+
+        Focal Loss focuses on hard, misclassified examples, which is useful for
+        segmenting small nodules in large 3D volumes.
+
+        Args:
+            pred (torch.Tensor): Predicted segmentation mask, shape (B, C, D, H, W)
+            target (torch.Tensor): Ground truth segmentation mask, shape (B, C, D, H, W)
+
+        Returns:
+            torch.Tensor: Focal Loss value
+        """
+        pred = F.softmax(pred, dim=1)
+        num_classes = pred.shape[1]
+
+        focal_loss = torch.zeros(1, device=pred.device)
+        for class_idx in range(num_classes):
+            pred_class = pred[:, class_idx, ...]
+            target_class = (target == class_idx).float()
+
+            # Compute Focal Loss
+            pt = target_class * pred_class + (1 - target_class) * (1 - pred_class)
+            focal_weight = (1 - pt) ** self.gamma
+            focal_loss += -self.alpha * focal_weight * torch.log(pt + self.eps)
+
+        return torch.mean(focal_loss)
+
+</file>
+<file path="./app/utils/patients.py">
+import pylidc as pl
+from typing import Tuple, List
+import random
+
+
+def get_patient_ids(
+    max_patients: int | None = None, train_ratio: float = 0.8
+) -> Tuple[List[str], List[str]]:
+    """
+    Get a list of patient IDs from the LIDC-IDRI dataset, split into training and validation sets.
+
+    Args:
+        max_patients (int, optional): Maximum number of patients to include. If None, include all patients.
+        train_ratio (float): Ratio of patients to use for training. Default is 0.8 (80% for training).
+
+    Returns:
+        Tuple[List[str], List[str]]: Two lists of patient IDs, (train_ids, val_ids)
+
+    Raises:
+        ValueError: If train_ratio is not between 0 and 1.
+    """
+    if not 0 < train_ratio < 1:
+        raise ValueError("train_ratio must be between 0 and 1")
+
+    # Query all patient IDs from the dataset
+    all_patient_ids = [scan.patient_id for scan in pl.query(pl.Scan).all()]
+
+    # Remove duplicates (in case a patient has multiple scans)
+    all_patient_ids = list(set(all_patient_ids))
+
+    # Shuffle the list to ensure random selection
+    random.shuffle(all_patient_ids)
+
+    # Limit the number of patients if max_patients is specified
+    if max_patients is not None:
+        all_patient_ids = all_patient_ids[:max_patients]
+
+    # Calculate the split point
+    split_point = int(len(all_patient_ids) * train_ratio)
+
+    # Split the IDs into train and validation sets
+    train_ids = all_patient_ids[:split_point]
+    val_ids = all_patient_ids[split_point:]
+
+    return train_ids, val_ids
+
+</file>

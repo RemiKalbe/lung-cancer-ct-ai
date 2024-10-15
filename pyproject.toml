@@ -1,0 +1,76 @@
+[project]
+name = "lung-cancer-ct-ai"
+version = "0.1.0"
+description = "A model capable of detecting lung cancer from CT scans"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Remi Kalbe", email = "me@remi.boo" }]
+
+dependencies = ["pylidc"]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+#
+# Pixi configuration
+#
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[tool.pixi.tasks]
+train = "python -m app.main"
+
+[tool.pixi.dependencies]
+ruff = ">=0.6.1,<0.7"
+numpy = ">=2.1.0,<2.2"
+pytorch = ">=2.4.0,<2.5"
+torchvision = ">=0.19.0,<0.20"
+scipy = ">=1.14.1,<1.15"
+pydantic = ">=2.8.2,<2.9"
+tqdm = ">=4.66.5,<4.67"
+setuptools = ">=74.1.2,<74.2"
+numpydantic = ">=1.6.3,<1.7"
+
+
+#
+# Ruff configuration
+#
+
+[tool.ruff]
+line-length = 100
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pixi",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 30
