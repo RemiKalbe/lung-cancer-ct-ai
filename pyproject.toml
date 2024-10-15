@@ -17,8 +17,8 @@ requires = ["hatchling"]
 #
 
 [tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["osx-arm64"]
+channels = ["conda-forge", "pytorch", "nvidia"]
+platforms = ["osx-arm64", "linux-64"]
 
 [tool.pixi.tasks]
 train = "python -m app.main"
@@ -33,6 +33,9 @@ pydantic = ">=2.8.2,<2.9"
 tqdm = ">=4.66.5,<4.67"
 setuptools = ">=74.1.2,<74.2"
 numpydantic = ">=1.6.3,<1.7"
+
+[tool.pixi.target.linux-64.dependencies]
+pytorch-cuda = "=12.4"
 
 
 #
