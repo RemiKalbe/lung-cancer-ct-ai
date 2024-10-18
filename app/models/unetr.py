@@ -553,6 +553,9 @@ class UNETR(nn.Module):
         Raises:
             ValueError: If input tensor shape doesn't match the expected input size.
         """
+        # Save the original input size
+        original_size = x.shape[2:]  # (D, H, W)
+
         # Move input to the device of the first module
         first_device = self.devices[0]
         x = x.to(first_device)
@@ -586,6 +589,9 @@ class UNETR(nn.Module):
             if skip is not None:
                 skip = skip.to(decoder_devices[i])
             x = decoder_block(x, skip)
+
+        # Upsample x to match the original input size
+        x = nn.functional.interpolate(x, size=original_size, mode='trilinear', align_corners=False)
 
         # Segmentation output
         x = x.to(self.module_device_map[self.segmentation_head])
