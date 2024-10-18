@@ -17,26 +17,34 @@ requires = ["hatchling"]
 #
 
 [tool.pixi.project]
-channels = ["conda-forge", "pytorch", "nvidia"]
+channels = ["pytorch", "conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
 
 [tool.pixi.tasks]
 train = "python -m app.main"
+check_cuda = 'python -c "import torch; print(torch.cuda.is_available())"'
 
 [tool.pixi.dependencies]
 ruff = ">=0.6.1,<0.7"
 numpy = ">=2.1.0,<2.2"
-pytorch = ">=2.4.0,<2.5"
-torchvision = ">=0.19.0,<0.20"
+pytorch = ">=2.5.0,<2.6"
+torchvision = ">=0.20.0,<0.21"
 scipy = ">=1.14.1,<1.15"
 pydantic = ">=2.8.2,<2.9"
 tqdm = ">=4.66.5,<4.67"
 setuptools = ">=74.1.2,<74.2"
 numpydantic = ">=1.6.3,<1.7"
 
-[tool.pixi.target.linux-64.dependencies]
+[tool.pixi.feature.cuda]
+channels = ["nvidia", "pytorch", "conda-forge"]
+platforms = ["linux-64"]
+system-requirements = { cuda = "12.4" }
+
+[tool.pixi.feature.cuda.dependencies]
 pytorch-cuda = "=12.4"
 
+[tool.pixi.environments]
+cuda = ["cuda"]
 
 #
 # Ruff configuration

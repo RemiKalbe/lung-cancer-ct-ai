@@ -85,7 +85,7 @@ def train(config: Dict[str, Any]):
 
     # Get patient IDs
     train_ids, val_ids = get_patient_ids(
-        max_patients=config["max_patients"], train_ratio=config["train_ratio"]
+        max_patients=config["max_patients"], train_ratio=config["train_ratio"], random_selection=False
     )
 
     # Load datasets

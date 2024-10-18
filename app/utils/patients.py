@@ -4,7 +4,7 @@ import random
 
 
 def get_patient_ids(
-    max_patients: int | None = None, train_ratio: float = 0.8
+    max_patients: int | None = None, train_ratio: float = 0.8, random_selection: bool = True
 ) -> Tuple[List[str], List[str]]:
     """
     Get a list of patient IDs from the LIDC-IDRI dataset, split into training and validation sets.
@@ -29,7 +29,8 @@ def get_patient_ids(
     all_patient_ids = list(set(all_patient_ids))
 
     # Shuffle the list to ensure random selection
-    random.shuffle(all_patient_ids)
+    if random_selection:
+        random.shuffle(all_patient_ids)
 
     # Limit the number of patients if max_patients is specified
     if max_patients is not None:
