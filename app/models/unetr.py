@@ -292,7 +292,7 @@ class DecoderBlock(nn.Module):
         relu (nn.ReLU): ReLU activation function
     """
 
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 3, stride: int = 2):
+    def __init__(self, in_channels: int, out_channels: int, has_skip: bool, skip_channels: int | None = None, kernel_size: int = 3, stride: int = 2):
         """
         Initialize the DecoderBlock.
 
@@ -306,11 +306,16 @@ class DecoderBlock(nn.Module):
 
         # Transposed convolution for upsampling
         self.conv_trans = nn.ConvTranspose3d(
-            in_channels, out_channels, kernel_size=stride, stride=stride
+            in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=1, output_padding=1
         )
 
         # First convolution and normalization
-        self.conv1 = nn.Conv3d(out_channels * 2, out_channels, kernel_size=kernel_size, padding=1)
+        if has_skip:
+            assert skip_channels is not None, "skip_channels must be provided if has_skip is True"
+            conv1_in_channels = out_channels + skip_channels
+        else:
+            conv1_in_channels = out_channels
+        self.conv1 = nn.Conv3d(conv1_in_channels, out_channels, kernel_size=kernel_size, padding=1)
         self.norm1 = nn.BatchNorm3d(out_channels)
 
         # Second convolution and normalization
@@ -339,22 +344,23 @@ class DecoderBlock(nn.Module):
         Raises:
             ValueError: If the spatial dimensions of the skip connection do not match the upsampled input.
         """
-        # Upsample input
         x = self.conv_trans(x)
-
-        # Combine with skip connection if provided
         if skip is not None:
-            if x.shape[2:] != skip.shape[2:]:
-                raise ValueError(
-                    f"Shape mismatch in DecoderBlock: "
-                    f"upsampled shape {x.shape[2:]} != skip shape {skip.shape[2:]}"
-                )
-            x = tc.cat([x, skip], dim=1)
+            print(f"x shape before interpolation: {x.shape}")
+            print(f"skip shape: {skip.shape}")
 
-        # Apply convolutions with normalizations and activations
+            # Adjust x to match skip's spatial dimensions
+            x = nn.functional.interpolate(x, size=skip.shape[2:], mode='trilinear', align_corners=False)
+
+            print(f"x shape after interpolation: {x.shape}")
+
+            # Concatenate along the channel dimension
+            x = tc.cat([x, skip], dim=1)
+        else:
+            print(f"x shape (no skip): {x.shape}")
+
         x = self.relu(self.norm1(self.conv1(x)))
         x = self.relu(self.norm2(self.conv2(x)))
-
         return x
 
 
@@ -404,21 +410,35 @@ class UNETR(nn.Module):
         """
         super().__init__()
 
+        # Detect available devices (CUDA GPUs, MPS, or CPU)
+        if tc.cuda.is_available():
+            self.device_type = 'cuda'
+            self.num_devices = tc.cuda.device_count()
+            self.devices = [tc.device(f'cuda:{i}') for i in range(self.num_devices)]
+        elif tc.backends.mps.is_available():
+            self.device_type = 'mps'
+            self.num_devices = 1  # MPS supports only one device
+            self.devices = [tc.device('mps')]
+        else:
+            self.device_type = 'cpu'
+            self.num_devices = 1
+            self.devices = [tc.device('cpu')]
+
+        print(f"Using {self.num_devices} {self.device_type} devices")
+
         self.patch_embedding = PatchEmbedding(patch_size, in_channels, embed_dim)
         self.transformer = TransformerEncoder(embed_dim, depth, num_heads, mlp_ratio, dropout)
 
-        # Calculate the number of patches in each dimension
-        self.patches_per_dim = [img_size[i] // patch_size for i in range(3)]
+        # Get the number of skip connections from the transformer
+        self.num_skip_connections = len(self.transformer.get_output_layers())
 
-        # Decoder blocks
-        self.decoder_blocks = nn.ModuleList(
-            [
-                DecoderBlock(embed_dim, 512),
-                DecoderBlock(512, 256),
-                DecoderBlock(256, 128),
-                DecoderBlock(128, 64),
-            ]
-        )
+        # Dynamically calculate decoder channel sizes
+        self.decoder_channels = self.calculate_decoder_channels(embed_dim, self.num_skip_connections)
+        
+        # Initialize decoder blocks dynamically
+        self.decoder_blocks = nn.ModuleList()
+        self.init_decoder_blocks(embed_dim, self.decoder_channels)
+
 
         # Segmentation head
         self.segmentation_head = nn.Conv3d(64, out_channels, kernel_size=1)
@@ -433,6 +453,90 @@ class UNETR(nn.Module):
             nn.Linear(256, 1),
             nn.Sigmoid(),
         )
+
+        # Assign modules to devices
+        self._assign_modules_to_devices()
+
+    def calculate_decoder_channels(self, embed_dim: int, num_blocks: int) -> List[int]:
+        """
+        Calculate decoder channel sizes dynamically based on embed_dim and number of decoder blocks.
+        
+        Args:
+            embed_dim (int): Embedding dimension from the transformer.
+            num_blocks (int): Number of decoder blocks.
+        
+        Returns:
+            List[int]: List of output channels for each decoder block.
+        """
+        decoder_channels = []
+        current_channels = embed_dim
+        for _ in range(num_blocks):
+            current_channels = max(current_channels // 2, 64)  # Ensure minimum of 64 channels
+            decoder_channels.append(current_channels)
+        return decoder_channels
+
+    def init_decoder_blocks(self, embed_dim: int, decoder_channels: List[int]):
+        """
+        Initialize decoder blocks with dynamic calculation of in_channels and out_channels.
+
+        Args:
+            embed_dim (int): Embedding dimension from the transformer.
+            decoder_channels (List[int]): List of output channels for each decoder block.
+        """
+        num_skips = self.num_skip_connections
+        x_channels = embed_dim  # Initial number of channels from the transformer output
+
+        for i, out_channels in enumerate(decoder_channels):
+            if i < num_skips - 1:  # Adjusted condition
+                # There is a skip connection
+                has_skip = True
+                skip_channels = embed_dim  # Each skip connection has embed_dim channels
+            else:
+                # No skip connection
+                has_skip = False
+                skip_channels = None
+
+            in_channels = x_channels
+
+            # Debug statements
+            print(f"Decoder Block {i}: in_channels = {in_channels}, out_channels = {out_channels}, has_skip = {has_skip}")
+
+            # Create and append the decoder block
+            decoder_block = DecoderBlock(
+                in_channels,
+                out_channels,
+                has_skip,
+                skip_channels=skip_channels,
+                kernel_size=3,
+                stride=2,
+            )
+            self.decoder_blocks.append(decoder_block)
+
+            # Update x_channels for the next iteration
+            x_channels = out_channels
+
+    def _assign_modules_to_devices(self):
+        """
+        Dynamically assign modules to available devices for model parallelism.
+        """
+        module_list = [
+            self.patch_embedding,
+            self.transformer,
+            *self.decoder_blocks,
+            self.segmentation_head,
+            self.classification_head,
+        ]
+
+        # Distribute modules across devices
+        total_modules = len(module_list)
+        modules_per_device = (total_modules + self.num_devices - 1) // self.num_devices  # Ceiling division
+
+        self.module_device_map = {}
+        for idx, module in enumerate(module_list):
+            device_idx = idx // modules_per_device
+            device = self.devices[device_idx]
+            module.to(device)
+            self.module_device_map[module] = device
 
     def forward(self, x: tc.Tensor) -> Tuple[tc.Tensor, tc.Tensor]:
         """
@@ -449,14 +553,16 @@ class UNETR(nn.Module):
         Raises:
             ValueError: If input tensor shape doesn't match the expected input size.
         """
-        # Check input size
-        if x.shape[2:] != tuple(
-            self.patches_per_dim[i] * self.patch_embedding.patch_size for i in range(3)
-        ):
-            raise ValueError(f"Input tensor shape {x.shape} doesn't match the expected input size.")
+        # Move input to the device of the first module
+        first_device = self.devices[0]
+        x = x.to(first_device)
+
+        # Compute patches_per_dim dynamically
+        patches_per_dim = [dim // self.patch_embedding.patch_size for dim in x.shape[2:]]
 
         # Patch embedding
         x = self.patch_embedding(x)
+        x = x.to(self.module_device_map[self.transformer])  # Move to transformer device
 
         # Transformer encoder
         features = self.transformer(x)
@@ -464,20 +570,30 @@ class UNETR(nn.Module):
         # Reshape features for decoder
         batch_size = x.shape[0]
         features = [
-            feat.transpose(1, 2).view(batch_size, -1, *self.patches_per_dim) for feat in features
+            feat.transpose(1, 2).view(batch_size, -1, *patches_per_dim) for feat in features
         ]
+
+        # Prepare for decoder blocks
+        decoder_devices = [self.module_device_map[block] for block in self.decoder_blocks]
+        features = [feat.to(decoder_devices[0]) for feat in features]
 
         # Decoder
         x = features[-1]
         for i, decoder_block in enumerate(self.decoder_blocks):
+            # Move x to the device of the current decoder block if not already there
+            x = x.to(decoder_devices[i])
             skip = features[-(i + 2)] if i < len(features) - 1 else None
+            if skip is not None:
+                skip = skip.to(decoder_devices[i])
             x = decoder_block(x, skip)
 
         # Segmentation output
+        x = x.to(self.module_device_map[self.segmentation_head])
         segmentation = self.segmentation_head(x)
 
         # Classification output
-        classification = self.classification_head(features[-1])
+        class_input = features[-1].to(self.module_device_map[self.classification_head])
+        classification = self.classification_head(class_input)
 
         return segmentation, classification
 

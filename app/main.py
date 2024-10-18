@@ -58,15 +58,6 @@ def train(config: Dict[str, Any]):
     Args:
         config (Dict[str, Any]): Configuration dictionary containing hyperparameters and settings.
     """
-    # Set device
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available()
-        else "cpu"
-    )
-    logging.info(f"Using device: {device}")
 
     # Initialize model
     model = UNETR(
@@ -75,7 +66,7 @@ def train(config: Dict[str, Any]):
         img_size=config["img_size"],
         patch_size=config["patch_size"],
         embed_dim=config["embed_dim"],
-    ).to(device)
+    )
 
     # Initialize loss function and optimizer
     criterion = UNETRLoss(
@@ -109,20 +100,25 @@ def train(config: Dict[str, Any]):
 
         for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{config['num_epochs']}"):
             inputs, true_seg, true_class = batch
-            inputs, true_seg, true_class = (
-                inputs.to(device),
-                true_seg.to(device),
-                true_class.to(device),
-            )
+            # Inputs are initially on CPU; model handles device assignment internally
 
             optimizer.zero_grad()
 
+            # Forward pass
             pred_seg, pred_class = model(inputs)
+
+            # Move targets to the same device as outputs
+            true_seg = true_seg.to(pred_seg.device)
+            true_class = true_class.to(pred_class.device)
+
+            # Compute loss
             loss, seg_loss, class_loss = criterion(pred_seg, true_seg, pred_class, true_class)
 
+            # Backward pass and optimization
             loss.backward()
             optimizer.step()
 
+            # Accumulate losses
             train_loss += loss.item()
             train_seg_loss += seg_loss.item()
             train_class_loss += class_loss.item()
@@ -136,15 +132,19 @@ def train(config: Dict[str, Any]):
         with torch.no_grad():
             for batch in val_loader:
                 inputs, true_seg, true_class = batch
-                inputs, true_seg, true_class = (
-                    inputs.to(device),
-                    true_seg.to(device),
-                    true_class.to(device),
-                )
+                # Inputs are initially on CPU; model handles device assignment internally
 
+                # Forward pass
                 pred_seg, pred_class = model(inputs)
+
+                # Move targets to the same device as outputs
+                true_seg = true_seg.to(pred_seg.device)
+                true_class = true_class.to(pred_class.device)
+
+                # Compute loss
                 loss, seg_loss, class_loss = criterion(pred_seg, true_seg, pred_class, true_class)
 
+                # Accumulate losses
                 val_loss += loss.item()
                 val_seg_loss += seg_loss.item()
                 val_class_loss += class_loss.item()
@@ -169,6 +169,7 @@ def train(config: Dict[str, Any]):
                 },
                 f"checkpoint_epoch_{epoch+1}.pth",
             )
+
 
 
 if __name__ == "__main__":

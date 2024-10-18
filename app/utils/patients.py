@@ -23,7 +23,11 @@ def get_patient_ids(
         raise ValueError("train_ratio must be between 0 and 1")
 
     # Query all patient IDs from the dataset
-    all_patient_ids = [scan.patient_id for scan in pl.query(pl.Scan).all()]
+    if random_selection:
+        all_patient_ids = [scan.patient_id for scan in pl.query(pl.Scan).all()]
+    else:
+        # Query up to max_patients
+        all_patient_ids = [scan.patient_id for scan in pl.query(pl.Scan).limit(max_patients)]
 
     # Remove duplicates (in case a patient has multiple scans)
     all_patient_ids = list(set(all_patient_ids))
