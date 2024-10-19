@@ -172,3 +172,4 @@ cython_debug/
 *.egg-info
 
 .DS_Store
+.zed
