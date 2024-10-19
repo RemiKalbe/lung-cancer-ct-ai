@@ -1,3 +1,0 @@
-[dicom]
-path = /Users/remikalbe/Git/github.com/lung-cancer-ct-ai/dataset/manifest-1719166718557/LIDC-IDRI
-warn = True
